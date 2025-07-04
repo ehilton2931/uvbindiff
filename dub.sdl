@@ -1,0 +1,5 @@
+name "uvbindiff"
+description "Ultraviolet Binary Diff - A reimagining of VBinDiff in D"
+authors "Evan Hilton"
+copyright "Copyright © 2025, Evan Hilton"
+license "GPL-2.0-or-later"

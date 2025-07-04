@@ -1,0 +1,16 @@
+.dub
+docs.json
+__dummy.html
+docs/
+/uvbindiff
+uvbindiff.so
+uvbindiff.dylib
+uvbindiff.dll
+uvbindiff.a
+uvbindiff.lib
+uvbindiff-test-*
+*.exe
+*.pdb
+*.o
+*.obj
+*.lst
