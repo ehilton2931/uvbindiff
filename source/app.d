@@ -1,3 +1,4 @@
+import arguments;
 import keyinput;
 import processinput;
 import render;
@@ -20,7 +21,8 @@ void appMain(string[] args) {
 
 
 WholeProcessState init(string[] args) {
-	WholeProcessState state = new WholeProcessState(); // FIXME
+	Arguments arguments = parseArguments(args);
+	WholeProcessState state = new WholeProcessState(arguments); // FIXME
 	
 	// FIXME
 	initRender();

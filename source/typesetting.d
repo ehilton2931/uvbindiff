@@ -33,16 +33,16 @@ class TerminalStyle {
 TypesettingAtom[] typesetScreen(WholeProcessState state) {
 	int totalRows = getRows();
 	int fileCount = 0; // FIXME
-	if (totalRows < 2*fileCount + 4) { // Every file needs at least 2 rows, and the palette needs 4
+	if (totalRows < 2*fileCount + 5) { // Every file needs at least 2 rows, and the palette needs 5
 		state.quit = true;
 		//TODO msg
 		return null;
 	}
 	
-	// Command palette always occupies the last 4 rows
-	TypesettingAtom[] retVal = typesetCommandPalette(state, totalRows - 4);
+	// Command palette always occupies the last 5 rows
+	TypesettingAtom[] retVal = typesetCommandPalette(state, totalRows - 5);
 	
-	/*int rowsRemaining = totalRows - 4;
+	/*int rowsRemaining = totalRows - 5;
 	int rowsPerFile = rowsRemaining / fileCount;
 	int filesWithAdditionalRow = rowsRemaining % fileCount;
 	
@@ -57,23 +57,48 @@ TypesettingAtom[] typesetScreen(WholeProcessState state) {
 	
 	return retVal;
 }
+
+
+
 TypesettingAtom[] typesetCommandPalette(WholeProcessState state, int startRow) {
-	TypesettingAtom[] retVal = new TypesettingAtom[4];
+	TypesettingAtom[] retVal = new TypesettingAtom[5];
 	const int columnCount = getColumns();
 	dchar[] activeRow = new dchar[columnCount];
 	
-	// First row
-	activeRow[0] = '┌';
-	activeRow[columnCount-1] = '┐';
-	for (int i = 1; i < columnCount-1; i++) activeRow[i] = '─';
-	retVal[0] = new TypesettingAtom(startRow, 0, activeRow.idup);
-	// Fourth row
-	activeRow[0] = '└';
-	activeRow[columnCount-1] = '┘';
-	retVal[3] = new TypesettingAtom(startRow+3, 0, activeRow.idup);
+	retVal[0] = typesetHeaderRow(state, startRow);
+	retVal[4] = typesetFooterRow(state, startRow + 4);
 	
-	retVal[1] = new TypesettingAtom(0, 0, ""d);
-	retVal[2] = new TypesettingAtom(2, 0, ""d);
+	final switch (state.commandPaletteMode) {
+		case CommandPaletteMode.topLevel:
+			retVal[1] = typesetEmptyRow(startRow + 1);
+			retVal[2] = typesetEmptyRow(startRow + 2);
+			retVal[3] = typesetEmptyRow(startRow + 3);
+			break;
+	}
 	
 	return retVal;
+}
+
+TypesettingAtom typesetHeaderRow(WholeProcessState state, int startRow) {
+	int columnCount = state.terminal.targetColumns;
+	dchar[] rowChars = new dchar[columnCount];
+	
+	rowChars[0] = '┌';
+	for (int i = 1; i < columnCount-1; i++) rowChars[i] = '─';
+	rowChars[columnCount-1] = '┐';
+	
+	return new TypesettingAtom(startRow, 0, rowChars.idup);
+}
+TypesettingAtom typesetFooterRow(WholeProcessState state, int startRow) {
+	int columnCount = state.terminal.targetColumns;
+	dchar[] rowChars = new dchar[columnCount];
+	
+	rowChars[0] = '└';
+	for (int i = 1; i < columnCount-1; i++) rowChars[i] = '─';
+	rowChars[columnCount-1] = '┘';
+	
+	return new TypesettingAtom(startRow, 0, rowChars.idup);
+}
+TypesettingAtom typesetEmptyRow(int startRow) { // FIXME remove
+	return new TypesettingAtom(startRow, 0, ""d);
 }
