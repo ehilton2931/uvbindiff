@@ -4,13 +4,14 @@ class Atom {
 	// TODO: Replace with a proper algebraic data type
 	AtomType type;
 	
+	ulong row;
 	StringType styleKey;
 	string content;
 	
-	this(bool b) {
-		type = AtomType.dummy;
-		if (b) type = AtomType.endOfRow;
+	this(ulong r) {
+		type = AtomType.startOfRow;
 		
+		row = r;
 		styleKey = StringType.none;
 		content = "";
 	}
@@ -18,6 +19,7 @@ class Atom {
 	this(string s) {
 		type = AtomType.str;
 		
+		row = 0;
 		styleKey = StringType.none;
 		content = s;
 	}
@@ -25,6 +27,7 @@ class Atom {
 	this(StringType t) {
 		type = AtomType.style;
 		
+		row = 0;
 		styleKey = t;
 		content = "";
 		
@@ -33,14 +36,14 @@ class Atom {
 	this(StringType t, string s) {
 		type = AtomType.stylePlusStr;
 		
+		row = 0;
 		styleKey = t;
 		content = s;
 	}
 }
 
 enum AtomType {
-	dummy,
-	endOfRow,
+	startOfRow,
 	
 	style,
 	str,

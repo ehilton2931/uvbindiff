@@ -19,7 +19,7 @@ class WholeProcessState {
 			files[i] = new FileInformation(arguments.filenames[i], arguments.indexZeroAddresses[i]);
 		}
 		
-		typeset = new TypesetInformation();
+		typeset = new TypesetInformation(arguments.bytesPerRow);
 		render = new RenderInformation();
 		input = new InputInformation();
 	}
@@ -55,13 +55,16 @@ class ExitInformation {
 class ScreenInformation {
 	ulong rows;
 	ulong columns;
+	ulong firstRowOfPalette;
 	
 	this(ulong r, ulong c) {
-		update(r, c);
-	}
-	void update(ulong r, ulong c) { // TODO needed? or just construct a new instance?
 		rows = r;
 		columns = c;
+		firstRowOfPalette = 15;
+	}
+	
+	void calculateFirstRowOfPalette(WholeProcessState state) {
+		// FIXME implement
 	}
 }
 
@@ -123,10 +126,12 @@ class TypesetInformation {
 		return addressColumns + 1 + integerDataColumns + integerInternalSpacing + 1 + textColumns;
 	}
 	
-	this() {
+	this(ulong b) {
 		address = new AddressInformation();
 		integer = new IntegerInformation();
 		text = new TextInformation();
+		
+		bytesPerRow = b;
 	}
 }
 

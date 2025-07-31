@@ -1,0 +1,19 @@
+import atom;
+import impl_ncurses;
+import state;
+
+void render(WholeProcessState state, Atom[] atoms) {
+	for (int i = 0; i < atoms.length; i++) {
+		renderAtom(state, atoms[i]);
+	}
+	
+	commitRender();
+}
+
+void renderAtom(WholeProcessState state, Atom atom) {
+	renderAtom__ncurses(state, atom);
+}
+
+void commitRender() {
+	commitRender__ncurses();
+}
