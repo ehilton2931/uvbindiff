@@ -2,6 +2,7 @@ import core.stdc.locale;
 import deimos.ncurses;
 
 import atom;
+import keyinput;
 import state;
 
 // init and shutdown //=======================================================//
@@ -29,15 +30,64 @@ ScreenInformation getScreenInformation__ncurses() {
 }
 
 void shutdownKeyboard__ncurses() {
-	return;
+	return; // AFAIK no action is needed
 }
 
 void shutdownRender__ncurses() {
 	endwin();
 }
 
-void getch__ncurses() {
-	getch();
+void getch__ncurses(WholeProcessState state) {
+	import std.format;
+	int val = wgetch(stdscr);
+	state.exit.warn(format("%s", val));
+}
+
+// keyinput //================================================================//
+
+KeyInput getKeyInput__ncurses() {
+	dchar ncursesChar = wgetch(stdscr);
+	
+	switch (ncursesChar) {
+		// 60% keys
+		case ' ': .. case '~':
+			return new KeyInput(ncursesChar);
+		case KEY_BACKSPACE:
+			return new KeyInput(Scancode.kb_backspace);
+		case '\t':
+			return new KeyInput(Scancode.kb_tab); // TODO shift tab?
+		// TODO caps lock
+		case '\r', '\n':
+			return new KeyInput(Scancode.kb_return);
+		// TODO application menu
+			
+			// Navigation keys
+		case KEY_IC:
+			return new KeyInput(Scancode.kb_insert);
+		case KEY_DC:
+			return new KeyInput(Scancode.kb_delete);
+		case KEY_HOME:
+			return new KeyInput(Scancode.kb_home);
+		case KEY_END:
+			return new KeyInput(Scancode.kb_end);
+		case KEY_PPAGE:
+			return new KeyInput(Scancode.kb_page_up);
+		case KEY_NPAGE:
+			return new KeyInput(Scancode.kb_page_down);
+		case KEY_UP:
+			return new KeyInput(Scancode.kb_up);
+		case KEY_DOWN:
+			return new KeyInput(Scancode.kb_down);
+		case KEY_LEFT:
+			return new KeyInput(Scancode.kb_left);
+		case KEY_RIGHT:
+			return new KeyInput(Scancode.kb_right);
+			
+		// TODO escape & function keys?
+			
+		default:
+			return new KeyInput(Scancode.none);
+	}
 }
 
 // render //==================================================================//

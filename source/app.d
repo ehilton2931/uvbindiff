@@ -1,8 +1,9 @@
 import std.stdio;
 
 import atom;
-import impl_ncurses;
 import init_shutdown;
+import keyinput;
+import processinput;
 import rendering;
 import state;
 import typesetting;
@@ -22,10 +23,8 @@ void loop(WholeProcessState state) {
 		Atom[] atoms = typeset(state);
 		if (state.exit.shouldQuit) break;
 		render(state, atoms);
-		import deimos.ncurses; getch__ncurses();
-		state.exit.normal();
 		
-		/*FIXME KeyInput input = getInput();
-		processInput(state, input);*/
+		KeyInput input = getKeyInput();
+		processKeyInput(state, input);
 	}
 }
