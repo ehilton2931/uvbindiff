@@ -7,16 +7,16 @@ import state;
 
 // init and shutdown //=======================================================//
 
-void initRender__ncurses() {
+void initRender__ncurses(ExitInformation exit) {
 	setlocale(LC_CTYPE, "");
-	initscr();
-	/*FIXME if (!has_colors()) {
-		endwin();
-		state.quit = true;
-		if not already occupied, state.errmsg = "Your terminal doesn't support colors!"
-	}*/
+	initscr(); // Does not return on error
 	
-	start_color();
+	if (!has_colors()) {
+		endwin();
+		exit.error("Your terminal doesn't support colors!");
+	} else {
+		start_color();
+	}
 }
 
 void initKeyboard__ncurses() {
@@ -56,12 +56,10 @@ KeyInput getKeyInput__ncurses() {
 			return new KeyInput(Scancode.kb_backspace);
 		case '\t':
 			return new KeyInput(Scancode.kb_tab); // TODO shift tab?
-		// TODO caps lock
 		case '\r', '\n':
 			return new KeyInput(Scancode.kb_return);
-		// TODO application menu
 			
-			// Navigation keys
+		// Navigation keys
 		case KEY_IC:
 			return new KeyInput(Scancode.kb_insert);
 		case KEY_DC:

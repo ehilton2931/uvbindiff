@@ -23,12 +23,12 @@ WholeProcessState init(string[] args) {
 	Arguments arguments = parseArguments(args, exit);
 	// TODO User configuration
 	
-	initRender();
-	initKeyboard();
-	ScreenInformation screen = getScreenInformation();
+	if (!exit.shouldQuit) initRender(exit);
+	if (!exit.shouldQuit) initKeyboard();
+	ScreenInformation screen = new ScreenInformation(0, 0);
+	if (!exit.shouldQuit) screen = getScreenInformation();
 	
 	WholeProcessState state = new WholeProcessState(arguments, exit, screen);
-	
 	return state;
 }
 
@@ -123,8 +123,8 @@ ulong parseIntSafe(string s) {
 	return retVal;
 }
 
-void initRender() {
-	initRender__ncurses();
+void initRender(ExitInformation exit) {
+	initRender__ncurses(exit);
 }
 
 void initKeyboard() {

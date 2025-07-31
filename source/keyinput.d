@@ -29,13 +29,11 @@ KeyInput getKeyInput() {
 enum Scancode {
 	none = 0x00,
 	
-	// TODO check if caps lock and application menu are always intercepted by the OS/terminal
 	kb_backspace = 0x2a,
 	kb_tab       = 0x2b,
-	kb_caps_lock = 0x39,
 	kb_return    = 0x28, // Implementation note: fold numpad enter into this
 	// Space, while not technically printable, is handled by the unicode side
-	kb_menu      = 0x65, // The application menu key, a.k.a. the right click key
+	// Caps lock and application menu are not passed to the terminal (not shown by showkey -a)
 	
 	kb_insert    = 0x49,
 	kb_home      = 0x4a,
