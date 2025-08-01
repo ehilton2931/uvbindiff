@@ -10,10 +10,10 @@ void render(WholeProcessState state, Atom[] atoms) {
 	commitRender();
 }
 
-void renderAtom(WholeProcessState state, Atom atom) {
+private void renderAtom(WholeProcessState state, Atom atom) {
 	renderAtom__ncurses(state, atom);
 }
 
-void commitRender() {
+private void commitRender() {
 	commitRender__ncurses();
 }

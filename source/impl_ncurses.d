@@ -37,7 +37,7 @@ void shutdownRender__ncurses() {
 	endwin();
 }
 
-void getch__ncurses(WholeProcessState state) {
+void getch__ncurses(WholeProcessState state) { // FIXME remove on process input q
 	import std.format;
 	int val = wgetch(stdscr);
 	state.exit.warn(format("%s", val));
@@ -111,7 +111,7 @@ void renderAtom__ncurses(WholeProcessState state, Atom atom) {
 
 private static short nextColorPair = 1;
 private const bool assumeBoldIsBright = true;
-void setColorPair(Style style) {
+private void setColorPair(Style style) {
 	// If bright & bold are conflated, enable bold and mask out bright
 	short trueFg = cast(short) style.foregroundColor;
 	short trueBg = cast(short) style.backgroundColor;
@@ -149,7 +149,7 @@ void setColorPair(Style style) {
 	attron(COLOR_PAIR(foundColorPair));
 }
 
-void setUnderlining(Style style) {
+private void setUnderlining(Style style) {
 	if (style.underline > 0) {
 		attron(A_UNDERLINE);
 	} else {
@@ -157,6 +157,6 @@ void setUnderlining(Style style) {
 	}
 }
 
-void commitRender__ncurses() {
+private void commitRender__ncurses() { // FIXME private test
 	refresh();
 }

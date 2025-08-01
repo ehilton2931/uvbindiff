@@ -33,7 +33,7 @@ WholeProcessState init(string[] args) {
 }
 
 // TODO help message
-Arguments parseArguments(string[] args, ExitInformation exit) {
+private Arguments parseArguments(string[] args, ExitInformation exit) {
 	import std.algorithm;
 	import std.conv;
 	Arguments arguments = new Arguments();
@@ -105,7 +105,7 @@ Arguments parseArguments(string[] args, ExitInformation exit) {
 	return arguments;
 }
 
-ulong parseIntSafe(string s) {
+private ulong parseIntSafe(string s) {
 	import std.algorithm;
 	import std.conv;
 	ulong retVal = 0;
@@ -123,11 +123,11 @@ ulong parseIntSafe(string s) {
 	return retVal;
 }
 
-void initRender(ExitInformation exit) {
+private void initRender(ExitInformation exit) {
 	initRender__ncurses(exit);
 }
 
-void initKeyboard() {
+private void initKeyboard() {
 	initKeyboard__ncurses();
 }
 
@@ -152,10 +152,10 @@ void shutdown(WholeProcessState state) {
 	}
 }
 
-void shutdownKeyboard() {
+private void shutdownKeyboard() {
 	shutdownKeyboard__ncurses();
 }
 
-void shutdownRender() {
+private void shutdownRender() {
 	shutdownRender__ncurses();
 }

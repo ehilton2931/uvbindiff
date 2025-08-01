@@ -5,7 +5,7 @@ import typesetinformation;
 class WholeProcessState {
 	ExitInformation exit;
 	ScreenInformation screen;
-	FileInformationArray files;
+	FileInformationArray files; // FIXME various file exceptions
 	
 	TypesetInformation typeset;
 	RenderInformation render;
@@ -61,86 +61,7 @@ class ScreenInformation {
 	}
 	
 	void calculateFirstRowOfPalette(WholeProcessState state) {
-		// FIXME implement
-	}
-}
-
-// FIXME various file exceptions
-class FileInformation {
-	import std.mmfile;
-	string filename;
-	MmFile fileHandle;
-	
-	ulong currentTopRowIndex;
-	ulong addressOfIndexZero;
-	ubyte[] getSlice(ulong startIndex, ulong length) {
-		import std.checkedint;
-		Checked!(ulong, Saturate) working = startIndex;
-		working += length;
-		if (working > fileHandle.length) working = fileHandle.length;
-		
-		ulong endExclusive = working.get;
-		return cast(ubyte[]) fileHandle[startIndex .. endExclusive];
-	}
-	
-	this(string name, ulong iza) {
-		filename = name;
-		fileHandle = new MmFile(filename, MmFile.Mode.read, 0, null); // FIXME make readWrite
-		addressOfIndexZero = iza;
-	}
-	
-	ulong addressOfIndex(ulong actingIndex) {
-		import std.checkedint;
-		
-		Checked!(ulong, Saturate) working = actingIndex;
-		working += addressOfIndexZero;
-		return working.get;
-	}
-	ulong length() const {
-		return fileHandle.length;
-	}
-}
-
-class FileInformationArray {
-	FileInformation[] fileData;
-	private bool[] frozen;
-	
-	this(Arguments arguments) {
-		import std.algorithm;//.comparison
-		ulong count = min(arguments.filenameCount, arguments.filenames.length);
-		
-		fileData = new FileInformation[count];
-		frozen = new bool[count];
-		
-		for (int i = 0; i < count; i++) {
-			fileData[i] = new FileInformation(arguments.filenames[i], arguments.indexZeroAddresses[i]);
-		}
-	}
-	
-	void toggleFreeze(ulong i) {
-		if (i >= frozen.length) return;
-		frozen[i] = !frozen[i];
-	}
-	bool isFrozen(ulong i) {
-		if (i >= frozen.length) return false;
-		return frozen[i];
-	}
-	
-	
-	
-	private void tryMoveFileRelative(ulong file, ulong forwards, ulong backwards) {
-		if (file > fileData.length) return;
-		if (frozen[file]) return;
-		
-		import std.checkedint;
-		Checked!(ulong, Saturate) working = fileData[file].currentTopRowIndex;
-		
-		working -= backwards;
-		working += forwards;
-		// TODO -bytesDisplayedPerFile?
-		if (working >= fileData[file].length) working = fileData[file].length - 1;
-		
-		fileData[file].currentTopRowIndex = working.get;
+		// FIXME implement calculating first row of palette
 	}
 }
 
@@ -155,7 +76,7 @@ class RenderInformation {
 		styleMap = null;
 	}
 	
-	// FIXME properly implement
+	// FIXME properly implement style map
 	Style getStyle(StringType styleKey) {
 		return new Style(15, 4, 0);
 	}
