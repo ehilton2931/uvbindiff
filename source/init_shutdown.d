@@ -66,7 +66,7 @@ Arguments parseArguments(string[] args, ExitInformation exit) {
 			}
 		} else if (args[i].startsWith("--address")) {
 			ulong index = parseIntSafe(args[i][9..$]);
-			if (index == 0 || index >= arguments.indexZeroAddresses.length) {
+			if (index == 0 || index > arguments.indexZeroAddresses.length) {
 				exit.error("Illegal file index in parameter " ~ args[i]);
 				break;
 			}

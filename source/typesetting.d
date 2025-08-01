@@ -16,7 +16,7 @@ Atom[] typesetFiles(WholeProcessState state) {
 	Atom[] atoms = null;
 	
 	// TODO add side-by-side support
-	ulong rowsDisplayedPerFile = state.screen.firstRowOfPalette / state.files.length;
+	ulong rowsDisplayedPerFile = state.screen.firstRowOfPalette / state.files.fileData.length;
 	if (rowsDisplayedPerFile < 2) { // 1 for header, 1 for bytes
 		state.exit.error("Not enough rows!");
 		return null;

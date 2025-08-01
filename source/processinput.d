@@ -15,18 +15,18 @@ private void process__topLevel(WholeProcessState state, KeyInput input) {
 		// Quit
 		case 'q', 'Q': state.exit.normal(); return;
 		// Integer settings
-		/*FIXME case 'w', 'W': state.files.render.nextWidth(); return;
-		case 'a', 'A': state.files.render.nextAlignedness(); return;
-		case 's', 'S': state.files.render.nextSignedness(); return;
-		case 'z', 'Z': state.files.render.nextEndianness(); return;
-		case 'x', 'X': state.files.render.nextRadix(); return;*/
+		case 'w', 'W': state.typeset.integer.nextWidth(); return;
+		case 'a', 'A': state.typeset.integer.nextAlignedness(); return;
+		case 's', 'S': state.typeset.integer.nextSignedness(); return;
+		case 'z', 'Z': state.typeset.integer.nextEndianness(); return;
+		case 'x', 'X': state.typeset.integer.nextRadix(); return;
 		// Other top-level actions
-		//FIXME case '1': .. case '9': state.files.toggleFreeze(input.unicode); return;
+		case '1': .. case '3': state.files.toggleFreeze(input.unicode - 1); return;
 		//FIXME case ' ': state.files.gotoSpecial_nextDiff(); return;
 		
 		// Switch command palette
-		// FIXME c/u for configuration
-		// FIXME e for edit
+		// TODO c/u for configuration
+		// TODO e for edit
 		// FIXME f for find
 		// FIXME g for goto
 		

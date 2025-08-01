@@ -1,10 +1,11 @@
 import atom;
 import init_shutdown;
+import typesetinformation;
 
 class WholeProcessState {
 	ExitInformation exit;
 	ScreenInformation screen;
-	FileInformation[] files;
+	FileInformationArray files;
 	
 	TypesetInformation typeset;
 	RenderInformation render;
@@ -13,11 +14,7 @@ class WholeProcessState {
 	this(Arguments arguments, ExitInformation e, ScreenInformation s) {
 		exit = e;
 		screen = s;
-		
-		files = new FileInformation[arguments.filenameCount];
-		for (int i = 0; i < files.length; i++) {
-			files[i] = new FileInformation(arguments.filenames[i], arguments.indexZeroAddresses[i]);
-		}
+		files = new FileInformationArray(arguments);
 		
 		typeset = new TypesetInformation(arguments.bytesPerRow);
 		render = new RenderInformation();
@@ -92,7 +89,7 @@ class FileInformation {
 		addressOfIndexZero = iza;
 	}
 	
-	ulong address(ulong actingIndex) {
+	ulong addressOfIndex(ulong actingIndex) {
 		import std.checkedint;
 		
 		Checked!(ulong, Saturate) working = actingIndex;
@@ -104,114 +101,52 @@ class FileInformation {
 	}
 }
 
-
-
-class TypesetInformation {
-	AddressInformation address;
-	IntegerInformation integer;
-	TextInformation text;
+class FileInformationArray {
+	FileInformation[] fileData;
+	private bool[] frozen;
 	
-	ulong bytesPerRow;
-	ulong columnsPerRow() {
-		ulong addressColumns = 10;
-		ulong integerDataColumns = 3 * bytesPerRow;
-		ulong integerInternalSpacing = (bytesPerRow + 2) / 4; // See below
-		ulong textColumns = bytesPerRow;
-		// For internal spacing (with aligned data, unaligned addresses):
-			// 5 bytes needs 1 internal space (1.4)
-			// 6 bytes needs 2 internal spaces (1.4.1)
-			// Every additional 4 bytes needs an additional internal space: 10 -> (1.4.4.1)
+	this(Arguments arguments) {
+		import std.algorithm;//.comparison
+		ulong count = min(arguments.filenameCount, arguments.filenames.length);
 		
-		// 80 columns @ 16 bytes per row
-		return addressColumns + 1 + integerDataColumns + integerInternalSpacing + 1 + textColumns;
-	}
-	
-	this(ulong b) {
-		address = new AddressInformation();
-		integer = new IntegerInformation();
-		text = new TextInformation();
+		fileData = new FileInformation[count];
+		frozen = new bool[count];
 		
-		bytesPerRow = b;
+		for (int i = 0; i < count; i++) {
+			fileData[i] = new FileInformation(arguments.filenames[i], arguments.indexZeroAddresses[i]);
+		}
+	}
+	
+	void toggleFreeze(ulong i) {
+		if (i >= frozen.length) return;
+		frozen[i] = !frozen[i];
+	}
+	bool isFrozen(ulong i) {
+		if (i >= frozen.length) return false;
+		return frozen[i];
+	}
+	
+	
+	
+	private void tryMoveFileRelative(ulong file, ulong forwards, ulong backwards) {
+		if (file > fileData.length) return;
+		if (frozen[file]) return;
+		
+		import std.checkedint;
+		Checked!(ulong, Saturate) working = fileData[file].currentTopRowIndex;
+		
+		working -= backwards;
+		working += forwards;
+		// TODO -bytesDisplayedPerFile?
+		if (working >= fileData[file].length) working = fileData[file].length - 1;
+		
+		fileData[file].currentTopRowIndex = working.get;
 	}
 }
 
-enum LetterCase {
-	lowercase,
-	uppercase
-}
-
-class AddressInformation {
-	LetterCase letterCase;
-	AddressMode mode;
-	
-	this() {
-		letterCase = LetterCase.uppercase;
-		mode = AddressMode.hexadecimal;
-	}
-}
-enum AddressMode {
-	hexadecimal,
-	decimal,
-	//TODO gbRom
-}
-
-class IntegerInformation {
-	LetterCase letterCase;
-	
-	IntAlignedness alignedness;
-	IntEndianness endianness;
-	IntSignedness signedness;
-	IntWidth width;
-	IntRadix radix;
-	
-	this() {
-		letterCase = LetterCase.uppercase;
-		alignedness = IntAlignedness.unaligned;
-		endianness = IntEndianness.littleEndian;
-		signedness = IntSignedness.unsigned;
-		width = IntWidth.w8;
-		radix = IntRadix.hexadecimal;
-	}
-}
-enum IntAlignedness {
-	unaligned,
-	aligned
-}
-enum IntEndianness {
-	littleEndian,
-	bigEndian
-}
-enum IntSignedness {
-	unsigned,
-	signed
-}
-enum IntWidth {
-	w8,
-	w16,
-	w32,
-	//TODO? w64
-}
-enum IntRadix {
-	hexadecimal,
-	decimal,
-	//TODO binary
-}
-
-class TextInformation {
-	TextEncoding encoding;
-	
-	this() {
-		encoding = TextEncoding.ascii;
-	}
-}
-enum TextEncoding {
-	ascii,
-	//TODO ebcdic
-	//TODO utf-8
-	//TODO? thumb1
-}
 
 
+// TypesetInformation in its own file
 
 class RenderInformation {
 	private Style[StringType] styleMap;
@@ -225,7 +160,6 @@ class RenderInformation {
 		return new Style(15, 4, 0);
 	}
 }
-
 class Style {
 	ubyte foregroundColor;
 	ubyte backgroundColor;
@@ -240,8 +174,6 @@ class Style {
 		if (underline >= 2) underline = 2;
 	}
 }
-
-
 
 class InputInformation {
 	CommandPaletteMode mode;
