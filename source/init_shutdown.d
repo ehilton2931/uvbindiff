@@ -25,10 +25,8 @@ WholeProcessState init(string[] args) {
 	
 	if (!exit.shouldQuit) initRender(exit);
 	if (!exit.shouldQuit) initKeyboard();
-	ScreenInformation screen = new ScreenInformation(0, 0);
-	if (!exit.shouldQuit) screen = getScreenInformation();
 	
-	WholeProcessState state = new WholeProcessState(arguments, exit, screen);
+	WholeProcessState state = new WholeProcessState(arguments, exit);
 	return state;
 }
 
@@ -129,10 +127,6 @@ private void initRender(ExitInformation exit) {
 
 private void initKeyboard() {
 	initKeyboard__ncurses();
-}
-
-ScreenInformation getScreenInformation() {
-	return getScreenInformation__ncurses();
 }
 
 

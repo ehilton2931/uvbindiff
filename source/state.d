@@ -11,14 +11,37 @@ class WholeProcessState {
 	RenderInformation render;
 	InputInformation input;
 	
-	this(Arguments arguments, ExitInformation e, ScreenInformation s) {
+	this(Arguments arguments, ExitInformation e) {
 		exit = e;
-		screen = s;
+		if (e.shouldQuit) return;
+		screen = new ScreenInformation(0, 0, 0);
 		files = new FileInformationArray(arguments);
 		
 		typeset = new TypesetInformation(arguments.bytesPerRow);
 		render = new RenderInformation();
 		input = new InputInformation();
+		
+		updateScreenInformation();
+	}
+	
+	void updateScreenInformation() {
+		ulong rows = getRows();
+		ulong columns = getColumns();
+		ulong bytesPerRow = typeset.bytesPerRow_root;
+		if (rows == screen.rows && columns == screen.columns && bytesPerRow == screen.bytesPerRow) {
+			return;
+		}
+		screen = new ScreenInformation(rows, columns, bytesPerRow);
+		
+		
+	}
+	
+	import impl_ncurses;
+	private ulong getRows() {
+		return getRows__ncurses();
+	}
+	private ulong getColumns() {
+		return getColumns__ncurses();
 	}
 }
 
@@ -50,18 +73,17 @@ class ExitInformation {
 }
 
 class ScreenInformation {
+	// Raw information, set by constructor
 	ulong rows;
 	ulong columns;
-	ulong firstRowOfPalette;
+	ulong bytesPerRow;
 	
-	this(ulong r, ulong c) {
+	// Derived information, set by caller of constructor
+	
+	this(ulong r, ulong c, ulong b) {
 		rows = r;
 		columns = c;
-		firstRowOfPalette = 15;
-	}
-	
-	void calculateFirstRowOfPalette(WholeProcessState state) {
-		// FIXME implement calculating first row of palette
+		bytesPerRow = b;
 	}
 }
 

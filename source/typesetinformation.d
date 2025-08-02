@@ -5,8 +5,8 @@ class TypesetInformation {
 	IntegerInformation integer;
 	TextInformation text;
 	
-	ulong bytesPerRow;
-	ulong columnsPerRow() {
+	ulong bytesPerRow_root;
+	ulong columnsPerRow(ulong bytesPerRow) {
 		ulong addressColumns = 10;
 		ulong integerDataColumns = 3 * bytesPerRow;
 		ulong integerInternalSpacing = (bytesPerRow + 2) / 4; // See below

@@ -25,8 +25,12 @@ void initKeyboard__ncurses() {
 	keypad(stdscr, true); // Enable reading of arrow keys
 }
 
-ScreenInformation getScreenInformation__ncurses() {
-	return new ScreenInformation(LINES, COLS);
+ulong getRows__ncurses() {
+	return LINES;
+}
+
+ulong getColumns__ncurses() {
+	return COLS;
 }
 
 void shutdownKeyboard__ncurses() {
