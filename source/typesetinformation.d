@@ -25,7 +25,7 @@ class TypesetInformation {
 		integer = new IntegerInformation();
 		text = new TextInformation();
 		
-		bytesPerRow = b;
+		bytesPerRow_root = b;
 	}
 }
 enum LetterCase {

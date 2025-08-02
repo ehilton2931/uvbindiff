@@ -41,12 +41,6 @@ void shutdownRender__ncurses() {
 	endwin();
 }
 
-void getch__ncurses(WholeProcessState state) { // FIXME remove on process input q
-	import std.format;
-	int val = wgetch(stdscr);
-	state.exit.warn(format("%s", val));
-}
-
 // keyinput //================================================================//
 
 KeyInput getKeyInput__ncurses() {
@@ -161,6 +155,6 @@ private void setUnderlining(Style style) {
 	}
 }
 
-private void commitRender__ncurses() { // FIXME private test
+void commitRender__ncurses() {
 	refresh();
 }

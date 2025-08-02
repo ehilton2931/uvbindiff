@@ -1,11 +1,12 @@
 import atom;
+import fileinformation;
 import init_shutdown;
 import typesetinformation;
 
 class WholeProcessState {
 	ExitInformation exit;
 	ScreenInformation screen;
-	FileInformationArray files; // FIXME various file exceptions
+	FileInformationArray files;
 	
 	TypesetInformation typeset;
 	RenderInformation render;
@@ -35,10 +36,10 @@ class WholeProcessState {
 		// File placement
 		{
 			// FIXME catch window not wide enough / potential arithmetic errors
-			screen.columnsPerFileRow = typeset.columsPerFileRow(bytesPerRow);
+			screen.columnsPerFileRow = typeset.columnsPerFileRow(bytesPerRow);
 			
-			ulong potentialFilesSideBySide = (columns+1) / (columnsPerFileRow+1);
-			import std.math;
+			ulong potentialFilesSideBySide = (columns+1) / (screen.columnsPerFileRow+1);
+			import std.algorithm;
 			screen.filesSideBySide = min(files.length, potentialFilesSideBySide);
 			screen.filesSideBySide = 1; // TODO implement side-by-side files
 			
