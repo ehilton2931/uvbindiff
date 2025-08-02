@@ -13,7 +13,6 @@ class WholeProcessState {
 	
 	this(Arguments arguments, ExitInformation e) {
 		exit = e;
-		if (e.shouldQuit) return;
 		screen = new ScreenInformation(0, 0, 0);
 		files = new FileInformationArray(arguments);
 		
@@ -21,7 +20,7 @@ class WholeProcessState {
 		render = new RenderInformation();
 		input = new InputInformation();
 		
-		updateScreenInformation();
+		if (!e.shouldQuit) updateScreenInformation();
 	}
 	
 	void updateScreenInformation() {
@@ -33,7 +32,25 @@ class WholeProcessState {
 		}
 		screen = new ScreenInformation(rows, columns, bytesPerRow);
 		
+		// File placement
+		{
+			// FIXME catch window not wide enough / potential arithmetic errors
+			screen.columnsPerFileRow = typeset.columsPerFileRow(bytesPerRow);
+			
+			ulong potentialFilesSideBySide = (columns+1) / (columnsPerFileRow+1);
+			import std.math;
+			screen.filesSideBySide = min(files.length, potentialFilesSideBySide);
+			screen.filesSideBySide = 1; // TODO implement side-by-side files
+			
+			screen.filesOverUnder = (files.length + (screen.filesSideBySide-1)) / screen.filesSideBySide;
+		}
 		
+		// Row and page calculation
+		{
+			// FIXME catch window not tall enough / potential underflows
+			screen.firstRowOfPalette = rows - 5; // FIXME or TODO implement proper palette calculation
+			screen.rowsPerFileWithHeader = screen.firstRowOfPalette / screen.filesOverUnder;
+		}
 	}
 	
 	import impl_ncurses;
@@ -79,6 +96,20 @@ class ScreenInformation {
 	ulong bytesPerRow;
 	
 	// Derived information, set by caller of constructor
+	// File placement
+	ulong columnsPerFileRow;
+	ulong filesSideBySide;
+	ulong filesOverUnder;
+	
+	// Rows and pages
+	ulong firstRowOfPalette;
+	ulong rowsPerFileWithHeader;
+	ulong rowsPerFilePage() {
+		return rowsPerFileWithHeader - 1;
+	}
+	ulong bytesPerFilePage() {
+		return rowsPerFilePage * bytesPerRow; // TODO potential overflow
+	}
 	
 	this(ulong r, ulong c, ulong b) {
 		rows = r;
