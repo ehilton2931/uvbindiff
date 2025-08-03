@@ -6,7 +6,7 @@ class Arguments {
 	ulong bytesPerRow;
 	ulong[] indexZeroAddresses;
 	string[] filenames;
-	int filenameCount;
+	ulong filenameCount;
 	
 	this() {
 		bytesPerRow = 16;
@@ -38,7 +38,7 @@ private Arguments parseArguments(string[] args, ExitInformation exit) {
 	
 	// Parsing
 	bool forceFilename = false;
-	for (int i = 1; i < args.length; i++) {
+	for (ulong i = 1; i < args.length; i++) {
 		if (forceFilename) {
 			// Same as final else
 			if (arguments.filenameCount >= arguments.filenames.length) {
@@ -138,7 +138,7 @@ void shutdown(WholeProcessState state) {
 	shutdownKeyboard();
 	shutdownRender();
 	
-	for (int i = 0; i < state.exit.warningMessages.length; i++) {
+	for (ulong i = 0; i < state.exit.warningMessages.length; i++) {
 		writeln(state.exit.warningMessages[i]);
 	}
 	if (state.exit.errorMessage != "") {

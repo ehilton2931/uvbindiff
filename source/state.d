@@ -15,7 +15,7 @@ class WholeProcessState {
 	this(Arguments arguments, ExitInformation e) {
 		exit = e;
 		screen = new ScreenInformation(0, 0, 0);
-		files = new FileInformationArray(arguments);
+		files = new FileInformationArray(arguments, exit);
 		
 		typeset = new TypesetInformation(arguments.bytesPerRow);
 		render = new RenderInformation();
@@ -127,12 +127,27 @@ class RenderInformation {
 	private Style[StringType] styleMap;
 	
 	this() {
-		styleMap = null;
+		styleMap = new Style[StringType];
+		
+		styleMap[StringType.none] = new Style(0, 0, 0);
+		styleMap[StringType.ui] = new Style(15, 4, 0);
+		styleMap[StringType.fileHeader] = new Style(0, 15, 0);
+		
+		styleMap[StringType.addressPrimary] = new Style(15, 4, 0);
+		styleMap[StringType.addressSecondary] = new Style(7, 4, 0);
+		styleMap[StringType.integerPrimary] = new Style(15, 4, 0);
+		styleMap[StringType.integerSecondary] = new Style(7, 4, 0);
+		styleMap[StringType.textPrimary] = new Style(15, 4, 0);
+		styleMap[StringType.textSecondary] = new Style(7, 4, 0);
+		
+		styleMap[StringType.diff1Primary] = new Style(9, 4, 0);
+		styleMap[StringType.diff1Secondary] = new Style(1, 4, 0);
+		styleMap[StringType.diff2Primary] = new Style(10, 4, 0);
+		styleMap[StringType.diff2Secondary] = new Style(2, 4, 0);
 	}
 	
-	// FIXME properly implement style map
 	Style getStyle(StringType styleKey) {
-		return new Style(15, 4, 0);
+		return styleMap[styleKey];
 	}
 }
 class Style {

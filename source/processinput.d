@@ -24,11 +24,15 @@ private void process__topLevel(WholeProcessState state, KeyInput input) {
 		default: break;
 	}
 	
+	ulong pageMovement = state.screen.bytesPerFilePage - state.screen.bytesPerRow;
+	ulong rowMovement = state.screen.bytesPerRow;
+	ulong singleMovement = 1; // NOTE aligned addresses would need values other than 1 
+	
 	// Handle everything else
 	if (input.unicode != '\U0010FFFF') switch (input.unicode) {
 		// File movement
-		case '1': .. case '3': break; // FIXME toggle freeze
-		case ' ': break; // FIXME goto next file difference
+		case '1': .. case '3': state.files.file[input.unicode-1].toggleFreeze(); break;
+		case ' ': state.files.gotoNextDifference(pageMovement); return;
 		
 		// TODO? Address typesetting settings
 		// Integer typesetting settings
@@ -40,10 +44,27 @@ private void process__topLevel(WholeProcessState state, KeyInput input) {
 		// TODO Text typesetting settings
 		
 		// FIXME Switch command palette
+		// c/u configuration
+		// e edit
+		// f find
+		// g goto
 		
 		default: break;
 	} else switch (input.scancode) {
-		// FIXME File movement
+		// File movement
+		case Scancode.kb_up:    state.files.gotoRelative(0, rowMovement); return;
+		case Scancode.kb_down:  state.files.gotoRelative(rowMovement, 0); return;
+		case Scancode.kb_left:  state.files.gotoRelative(0, singleMovement); return;
+		case Scancode.kb_right: state.files.gotoRelative(singleMovement, 0); return;
+		
+		case Scancode.kb_home: state.files.gotoAbsoluteIndex(0); return;
+		case Scancode.kb_end:  state.files.gotoAbsoluteIndex(ulong.max); return;
+		case Scancode.kb_page_up:   state.files.gotoRelative(0, pageMovement); return;
+		case Scancode.kb_page_down: state.files.gotoRelative(pageMovement, 0); return;
+		
+		case Scancode.kb_return:    state.files.gotoNextDifference(pageMovement); return;
+		case Scancode.kb_backspace: state.files.gotoPreviousDifference(pageMovement); return;
+		
 		default: break;
 	}
 }

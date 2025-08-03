@@ -18,6 +18,7 @@ void appMain(string[] args) {
 	shutdown(state);
 }
 
+// FIXME check for int, private
 void loop(WholeProcessState state) {
 	while (!state.exit.shouldQuit) {
 		Atom[] atoms = typeset(state);

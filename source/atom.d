@@ -7,6 +7,7 @@ class Atom {
 	ulong row;
 	StringType styleKey;
 	string content;
+	char c;
 	
 	this(ulong r) {
 		type = AtomType.startOfRow;
@@ -14,14 +15,7 @@ class Atom {
 		row = r;
 		styleKey = StringType.none;
 		content = "";
-	}
-	
-	this(string s) {
-		type = AtomType.str;
-		
-		row = 0;
-		styleKey = StringType.none;
-		content = s;
+		c = '\xFF';
 	}
 	
 	this(StringType t) {
@@ -30,7 +24,25 @@ class Atom {
 		row = 0;
 		styleKey = t;
 		content = "";
+		c = '\xFF';
+	}
+	
+	this(string s) {
+		type = AtomType.str;
 		
+		row = 0;
+		styleKey = StringType.none;
+		content = s;
+		c = '\xFF';
+	}
+	
+	this(char x) {
+		type = AtomType.chr;
+		
+		row = 0;
+		styleKey = StringType.none;
+		content = "";
+		c = x;
 	}
 	
 	this(StringType t, string s) {
@@ -39,6 +51,7 @@ class Atom {
 		row = 0;
 		styleKey = t;
 		content = s;
+		c = '\xFF';
 	}
 }
 
@@ -47,6 +60,7 @@ enum AtomType {
 	
 	style,
 	str,
+	chr,
 	
 	stylePlusStr
 }
@@ -54,6 +68,7 @@ enum AtomType {
 enum StringType {
 	none,
 	ui,
+	fileHeader,
 	
 	addressPrimary,
 	addressSecondary,

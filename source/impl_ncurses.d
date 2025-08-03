@@ -102,6 +102,10 @@ void renderAtom__ncurses(WholeProcessState state, Atom atom) {
 		printw(toStringz(atom.content));
 	}
 	
+	if (atom.type == AtomType.chr) {
+		addch(atom.c);
+	}
+	
 	if (atom.type == AtomType.startOfRow) {
 		move(cast(int) atom.row, 0);
 	}

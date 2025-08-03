@@ -3,7 +3,7 @@ import impl_ncurses;
 import state;
 
 void render(WholeProcessState state, Atom[] atoms) {
-	for (int i = 0; i < atoms.length; i++) {
+	for (ulong i = 0; i < atoms.length; i++) {
 		renderAtom(state, atoms[i]);
 	}
 	
