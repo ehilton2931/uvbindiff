@@ -49,7 +49,7 @@ class WholeProcessState {
 		// Row and page calculation
 		{
 			// FIXME catch window not tall enough / potential underflows
-			screen.firstRowOfPalette = rows - 5; // FIXME or TODO implement proper palette calculation
+			screen.firstRowOfPalette = rows - 0; // FIXME or TODO implement proper palette calculation
 			screen.rowsPerFileWithHeader = screen.firstRowOfPalette / screen.filesOverUnder;
 		}
 	}

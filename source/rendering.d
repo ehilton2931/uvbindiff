@@ -3,11 +3,17 @@ import impl_ncurses;
 import state;
 
 void render(WholeProcessState state, Atom[] atoms) {
+	clearRender();
+	
 	for (ulong i = 0; i < atoms.length; i++) {
 		renderAtom(state, atoms[i]);
 	}
 	
 	commitRender();
+}
+
+private void clearRender() {
+	clearRender__ncurses();
 }
 
 private void renderAtom(WholeProcessState state, Atom atom) {

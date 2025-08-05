@@ -88,6 +88,10 @@ KeyInput getKeyInput__ncurses() {
 
 // render //==================================================================//
 
+void clearRender__ncurses() {
+	clear();
+}
+
 void renderAtom__ncurses(WholeProcessState state, Atom atom) {
 	import std.conv;
 	import std.string;

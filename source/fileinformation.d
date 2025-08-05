@@ -1,4 +1,5 @@
 import init_shutdown;
+import optbyte;
 import state;
 
 class FileInformationArray {
@@ -35,17 +36,17 @@ class FileInformationArray {
 		}
 		// TODO what if already in a difference
 		
-		ushort[] activeArr = new ushort[file.length];
+		OptByte[] bytesToDiff = new OptByte[file.length];
 		ulong offset = 1;
 		
 		while (true) {
-			for (int i = 0; i < file.length; i++) {
-				activeArr[i] = file[i].attemptGetPositiveOffset(offset);
+			for (ulong i = 0; i < file.length; i++) {
+				bytesToDiff[i] = file[i].attemptGetPositiveOffset(offset);
 			}
 			
 			// If all are None, backtrack 1 and exit
 			bool shouldBacktrack = true;
-			for (int i = 0; i < file.length; i++) if (activeArr[i] <= ubyte.max) {
+			for (ulong i = 0; i < file.length; i++) if (!bytesToDiff[i].isNone) {
 				shouldBacktrack = false;
 				break;
 			}
@@ -54,12 +55,15 @@ class FileInformationArray {
 				break;
 			}
 			
+			// If any are different, exit
 			bool shouldBreak = false;
-			for (int i = 1; i < file.length; i++) if (activeArr[i] != activeArr[0]) {
+			for (ulong i = 1; i < file.length; i++) if (bytesToDiff[i] != bytesToDiff[0]) {
 				shouldBreak = true;
 				break;
 			}
 			if (shouldBreak) break;
+			
+			offset++;
 		}
 		
 		gotoRelative(offset, 0);
@@ -72,17 +76,17 @@ class FileInformationArray {
 		}
 		// TODO what if already in a difference
 		
-		ushort[] activeArr = new ushort[file.length];
+		OptByte[] bytesToDiff = new OptByte[file.length];
 		ulong offset = 1;
 		
 		while (true) {
 			for (ulong i = 0; i < file.length; i++) {
-				activeArr[i] = file[i].attemptGetPositiveOffset(offset);
+				bytesToDiff[i] = file[i].attemptGetNegativeOffset(offset);
 			}
 			
 			// If all are None, backtrack 1 and exit
 			bool shouldBacktrack = true;
-			for (ulong i = 0; i < file.length; i++) if (activeArr[i] <= ubyte.max) {
+			for (ulong i = 0; i < file.length; i++) if (!bytesToDiff[i].isNone) {
 				shouldBacktrack = false;
 				break;
 			}
@@ -91,12 +95,15 @@ class FileInformationArray {
 				break;
 			}
 			
+			// If any are different, exit
 			bool shouldBreak = false;
-			for (ulong i = 1; i < file.length; i++) if (activeArr[i] != activeArr[0]) {
+			for (ulong i = 1; i < file.length; i++) if (bytesToDiff[i] != bytesToDiff[0]) {
 				shouldBreak = true;
 				break;
 			}
 			if (shouldBreak) break;
+			
+			offset++;
 		}
 		
 		gotoRelative(0, offset);
@@ -109,20 +116,20 @@ class FileInformationArray {
 			// Default value, useful for single file
 			retVal[i] = FileDifference.allSame;
 			
-			ushort[] activeArr = new ushort[file.length];
+			OptByte[] bytesToDiff = new OptByte[file.length];
 			for (ulong j = 0; j < file.length; j++) {
-				activeArr[j] = file[j].attemptGetPositiveOffset(i);
+				bytesToDiff[j] = file[j].attemptGetPositiveOffset(i);
 			}
 			
 			switch (file.length) {
 				case 1: break;
 				case 2:
-					if (activeArr[0] != activeArr[1]) retVal[i] = FileDifference.allDifferent;
+					if (bytesToDiff[0] != bytesToDiff[1]) retVal[i] = FileDifference.allDifferent;
 					break;
 				case 3:
-					bool same01 = activeArr[0] == activeArr[1];
-					bool same02 = activeArr[0] == activeArr[2];
-					bool same12 = activeArr[1] == activeArr[2];
+					bool same01 = bytesToDiff[0] == bytesToDiff[1];
+					bool same02 = bytesToDiff[0] == bytesToDiff[2];
+					bool same12 = bytesToDiff[1] == bytesToDiff[2];
 					
 					if (same01 && same02 && same12) {
 						// All same, use default
@@ -211,20 +218,40 @@ class FileInformation {
 	
 	
 	
-	ushort attemptGetPositiveOffset(ulong offset) {
+	OptByte attemptGetPositiveOffset(ulong offset) {
 		Checked!(ulong, Saturate) working = index;
 		working += offset;
 		
-		if (working >= fileHandle.length) return ushort.max;
-		return data[working.get];
+		if (working >= fileHandle.length) return OptByte(true);
+		return OptByte(data[working.get]);
 	}
 	
-	ushort attemptGetNegativeOffset(ulong offset) {
+	OptByte attemptGetNegativeOffset(ulong offset) {
 		Checked!(ulong, Saturate) working = index;
 		working -= offset;
 		
-		if (working == 0 && offset > index) return ushort.max;
-		return data[working.get];
+		if (working == 0 && offset > index) return OptByte(true);
+		return OptByte(data[working.get]);
+	}
+	
+	OptByte[] getSlice(ulong offset, ulong length) {
+		OptByte[] retVal = new OptByte[length];
+		
+		for (ulong i = 0; i < length; i++) {
+			Checked!(ulong, Saturate) working = offset;
+			working += i;
+			
+			retVal[i] = attemptGetPositiveOffset(working.get);
+		}
+		
+		return retVal;
+	}
+	
+	ulong getOffsetAddress(ulong offset) {
+		Checked!(ulong, Saturate) working = index;
+		working += addressOfIndexZero;
+		working += offset;
+		return working.get;
 	}
 }
 

@@ -31,7 +31,7 @@ private void process__topLevel(WholeProcessState state, KeyInput input) {
 	// Handle everything else
 	if (input.unicode != '\U0010FFFF') switch (input.unicode) {
 		// File movement
-		case '1': .. case '3': state.files.file[input.unicode-1].toggleFreeze(); break;
+		case '1': .. case '3': state.files.file[input.unicode-'1'].toggleFreeze(); break;
 		case ' ': state.files.gotoNextDifference(pageMovement); return;
 		
 		// TODO? Address typesetting settings

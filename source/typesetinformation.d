@@ -9,12 +9,9 @@ class TypesetInformation {
 	ulong columnsPerFileRow(ulong bytesPerRow) {
 		ulong addressColumns = 10;
 		ulong integerDataColumns = 3 * bytesPerRow;
-		ulong integerInternalSpacing = (bytesPerRow + 2) / 4; // See below
+		ulong integerInternalSpacing = getIntegerInternalSpacing(bytesPerRow);
 		ulong textColumns = bytesPerRow;
-		// For internal spacing (with aligned data, unaligned addresses):
-		// 5 bytes needs 1 internal space (1.4)
-		// 6 bytes needs 2 internal spaces (1.4.1)
-		// Every additional 4 bytes needs an additional internal space: 10 -> (1.4.4.1)
+		
 		
 		// 80 columns @ 16 bytes per row
 		return addressColumns + 1 + integerDataColumns + integerInternalSpacing + 1 + textColumns;
@@ -27,10 +24,20 @@ class TypesetInformation {
 		
 		bytesPerRow_root = b;
 	}
+	
+	long getIntegerInternalSpacing(ulong bytesPerRow) {
+		// For internal spacing (with aligned data, unaligned addresses):
+		// 5 bytes needs 1 internal space (1.4)
+		// 6 bytes needs 2 internal spaces (1.4.1)
+		// Every additional 4 bytes needs an additional internal space: 10 -> (1.4.4.1)
+		
+		// TODO potential overflow
+		return (bytesPerRow + 2) / 4;
+	}
 }
 enum LetterCase {
-	lowercase,
-	uppercase
+	uppercase,
+	lowercase
 }
 
 
